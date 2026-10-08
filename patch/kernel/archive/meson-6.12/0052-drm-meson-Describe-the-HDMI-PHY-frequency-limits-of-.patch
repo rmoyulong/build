@@ -11,16 +11,18 @@ Meson8b only supports up to 1080p according to it's datasheet. Limit the
 Meson8b SoC's to 1.65GHz (similar to what's already there for GXL S805X
 and S805Y).
 
+Also correct max_hdmi_phy_freq units to Hz on kernels that still ship 1650000000.
+
 Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 ---
- drivers/gpu/drm/meson/meson_drv.c | 18 +++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ drivers/gpu/drm/meson/meson_drv.c | 20 ++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/gpu/drm/meson/meson_drv.c b/drivers/gpu/drm/meson/meson_drv.c
 index 111111111111..222222222222 100644
 --- a/drivers/gpu/drm/meson/meson_drv.c
 +++ b/drivers/gpu/drm/meson/meson_drv.c
-@@ -200,13 +200,29 @@ struct meson_drm_soc_attr {
+@@ -167,13 +167,29 @@ struct meson_drm_soc_attr {
  };
  
  static const struct meson_drm_soc_attr meson_drm_soc_attrs[] = {
@@ -43,7 +45,8 @@ index 111111111111..222222222222 100644
 +	 */
  	{
  		.limits = {
- 			.max_hdmi_phy_freq = 1650000,
+-			.max_hdmi_phy_freq = 1650000000,
++			.max_hdmi_phy_freq = 1650000,
  		},
  		.attrs = (const struct soc_device_attribute []) {
  			{ .soc_id = "GXL (S805*)", },
@@ -53,4 +56,3 @@ index 111111111111..222222222222 100644
  	},
 -- 
 Armbian
-
