@@ -160,8 +160,8 @@ runs:
       run: |
         ls
         sed -i 's/declare -g KERNELBRANCH="tag:v6.12.28" # frozen on this version/declare -g KERNELBRANCH="tag:v${ARMBIAN_TAG}"/' \
-          config/sources/families/include/meson_common.inc
-        curl -fsSL -o patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
+          build/config/sources/families/include/meson_common.inc
+        curl -fsSL -o build/patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
           "https://raw.githubusercontent.com/rmoyulong/OneCloud_armbian/refs/heads/master/patch/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch"
         grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' config/sources/families/include/meson_common.inc || true  
         ls
@@ -577,7 +577,8 @@ runs:
       shell: bash
       run: |    
         sudo apt install android-sdk-libsparse-utils
-          
+        
+        cd build        
         ver="v0.3.2"
         curl -L -o ./AmlImg https://github.com/rmoyulong/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
         chmod +x ./AmlImg   
@@ -585,6 +586,7 @@ runs:
     - name: "下载解压最新u-boot"
       shell: bash
       run: |
+        cd build      
         echo "::group::Download"
         curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
         echo "::endgroup::"
@@ -597,6 +599,7 @@ runs:
       shell: bash
       run: |
         ls
+        cd build
         diskimg=$(ls output/images/*.img)
         loop=$(sudo losetup --find --show --partscan $diskimg)
         sudo img2simg ${loop}p1 burn/boot.simg
@@ -607,6 +610,7 @@ runs:
     - name: "生成烧录镜像"
       shell: bash
       run: |
+        cd build
         echo -n "sha1sum $(sha1sum burn/boot.simg | awk '{print $1}')" >burn/boot.VERIFY
         echo -n "sha1sum $(sha1sum burn/rootfs.simg | awk '{print $1}')" >burn/rootfs.VERIFY
 
@@ -624,6 +628,7 @@ runs:
     - name: "镜像哈希信息和压缩"
       shell: bash
       run: |
+        cd build
         for f in output/images/*.img; do
           sha256sum "$f" | tee -a sha256sum
           xz --threads=0 --compress "$f"
