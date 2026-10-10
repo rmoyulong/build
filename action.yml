@@ -158,6 +158,7 @@ runs:
       env:
         ARMBIAN_TAG: 6.12.112   
       run: |
+        ls
         sed -i 's/declare -g KERNELBRANCH="tag:v6.12.28" # frozen on this version/declare -g KERNELBRANCH="tag:v${ARMBIAN_TAG}"/' \
           config/sources/families/include/meson_common.inc
         curl -fsSL -o patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
