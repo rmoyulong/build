@@ -163,7 +163,7 @@ runs:
           build/config/sources/families/include/meson_common.inc
         curl -fsSL -o build/patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
           "https://raw.githubusercontent.com/rmoyulong/OneCloud_armbian/refs/heads/master/patch/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch"
-        grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' config/sources/families/include/meson_common.inc || true  
+        grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' build/config/sources/families/include/meson_common.inc || true  
         ls
 
     - shell: bash
