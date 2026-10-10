@@ -617,7 +617,7 @@ runs:
         fi
 
         echo "解压镜像：${diskxz[0]}"
-        sudo xz -dkf "${diskxz[0]}"   # -k 保留原 xz，-f 覆盖已存在的 img
+        sudo xz -dkf "${diskxz[0]}"   # -k 保留原 xz，-f 覆盖已存在的 img 或者一行即可xz -dc "${diskxz[0]}" > "${diskxz[0]%.xz}"
         sudo chown "$(id -u):$(id -g)" "${diskxz[0]%.xz}"
 
         # 同样断言只有一个 img
