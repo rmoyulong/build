@@ -591,6 +591,7 @@ runs:
       shell: bash
       run: |
         cd build      
+        ls output/images/*
         echo "::group::Download"
         curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
         echo "::endgroup::"
