@@ -154,6 +154,7 @@ runs:
         path: custom
         
     - name: "给玩客云armbian打补丁"
+      shell: bash
       env:
         ARMBIAN_TAG: 6.12.112   
       run: |
