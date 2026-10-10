@@ -572,7 +572,6 @@ runs:
     - name: "下载解压最新u-boot"
       shell: bash
       run: |
-        
         echo "::group::Download"
         curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
         echo "::endgroup::"
@@ -617,7 +616,7 @@ runs:
         done
 
     - name: "上传 IMG"
-    - uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
+      uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
       with:
         tag: ${{ inputs.armbian_release_tag != '' && inputs.armbian_release_tag || env.ARMBIAN_VERSION }}
         name: "${{ inputs.armbian_release_title }}"
