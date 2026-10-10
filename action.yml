@@ -220,7 +220,7 @@ index 111111111111..222222222222 100644
  	},
 -- 
 Armbian
-        EOF
+EOF
         grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' build/config/sources/families/include/meson_common.inc || true  
         ls
 
