@@ -3,6 +3,11 @@ author: "https://github.com/rmoyulong/build"
 description: "编译 Armbian Linux"
 inputs:
 
+  ONECLOUD_VERSION: 
+    description: "玩客云 armbian Linux 版本"
+    required: true
+    default: "6.12.112"
+    
   armbian_token:
     description: "GitHub installation access token"
     required: true
@@ -153,12 +158,10 @@ runs:
         clean: false
         path: custom
         
-    - name: "给玩客云armbian打补丁"
+    - name: "给玩客云armbian打补丁-version[${{ inputs.ONECLOUD_VERSION }}]"
       shell: bash
-      env:
-        ARMBIAN_TAG: 6.12.112   
       run: |
-        sed -i 's/declare -g KERNELBRANCH="tag:v6.12.28" # frozen on this version/declare -g KERNELBRANCH="tag:v${ARMBIAN_TAG}"/' \
+        sed -i 's/declare -g KERNELBRANCH="tag:v6.12.28" # frozen on this version/declare -g KERNELBRANCH="tag:v${{ inputs.ONECLOUD_VERSION }}"/' \
           build/config/sources/families/include/meson_common.inc
         rm build/patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch
         curl -fsSL -o build/patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
