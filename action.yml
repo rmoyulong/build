@@ -161,7 +161,8 @@ runs:
           config/sources/families/include/meson_common.inc
         curl -fsSL -o patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
           "https://raw.githubusercontent.com/rmoyulong/OneCloud_armbian/refs/heads/master/patch/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch"
-        grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' config/sources/families/include/meson_common.inc || true         
+        grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' config/sources/families/include/meson_common.inc || true  
+        ls
 
     - shell: bash
       env:
@@ -593,7 +594,8 @@ runs:
     - name: "提取引导分区和根文件系统分区"
       shell: bash
       run: |
-        diskimg=$(ls build/output/images/*.img)
+        ls
+        diskimg=$(ls output/images/*.img)
         loop=$(sudo losetup --find --show --partscan $diskimg)
         sudo img2simg ${loop}p1 burn/boot.simg
         sudo img2simg ${loop}p2 burn/rootfs.simg
@@ -613,14 +615,14 @@ runs:
         VERIFY:rootfs:normal:rootfs.VERIFY
         EOF
 
-        prefix=$(ls build/output/images/*.img | sed 's/\.img$//')
+        prefix=$(ls output/images/*.img | sed 's/\.img$//')
         burnimg=${prefix}.burn.img
         ./AmlImg pack $burnimg burn/
 
     - name: "镜像哈希信息和压缩"
       shell: bash
       run: |
-        for f in build/output/images/*.img; do
+        for f in output/images/*.img; do
           sha256sum "$f" | tee -a sha256sum
           xz --threads=0 --compress "$f"
         done
