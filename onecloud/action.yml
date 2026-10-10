@@ -608,8 +608,12 @@ runs:
         cp -rfp output/images/*.xz ./
         diskxz=$(ls ./*.xz)
         xz -d $diskxz
-        ls
         mv *.img output/images/
+        echo "build目录列表"
+        ls
+        echo "output/images/目录列表"
+        ls  output/images/
+        sync
         
         diskimg=$(ls output/images/*.img)
         loop=$(sudo losetup --find --show --partscan $diskimg)
