@@ -161,7 +161,7 @@ runs:
         sed -i 's/declare -g KERNELBRANCH="tag:v6.12.28" # frozen on this version/declare -g KERNELBRANCH="tag:v${ARMBIAN_TAG}"/' \
           build/config/sources/families/include/meson_common.inc
         rm build/patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch
-        cp -rf $GITHUB_WORKSPACE/onecloud/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch build/patch/kernel/archive/meson-6.12/
+        cp -rf $GITHUB_WORKSPACE/patch/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch build/patch/kernel/archive/meson-6.12/
         grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' build/config/sources/families/include/meson_common.inc || true  
         ls
 
