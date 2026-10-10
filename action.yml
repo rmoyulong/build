@@ -602,7 +602,7 @@ runs:
         ./AmlImg unpack ./uboot.img burn/
         echo "::endgroup::"
 
-    - name: "提取引导分区和根文件系统分区"
+    - name: "提取引导分区和根文件系统分区并生成线刷固件"
       shell: bash
       run: |
         set -euo pipefail   # 比 -e 更严格：未定义变量报错、管道任一环失败报错
@@ -671,11 +671,7 @@ runs:
 
         echo "burn/ 目录内容："
         ls -lh burn/
-
-    - name: "生成烧录镜像"
-      shell: bash
-      run: |
-        cd build
+        
         echo -n "sha1sum $(sha1sum burn/boot.simg | awk '{print $1}')" >burn/boot.VERIFY
         echo -n "sha1sum $(sha1sum burn/rootfs.simg | awk '{print $1}')" >burn/rootfs.VERIFY
 
@@ -686,9 +682,11 @@ runs:
         VERIFY:rootfs:normal:rootfs.VERIFY
         EOF
 
-        prefix=$(ls output/images/*.img | sed 's/\.img$//')
+        prefix=$(ls $diskimg | sed 's/\.img$//')
         burnimg=${prefix}.burn.img
         ./AmlImg pack $burnimg burn/
+
+        rm $diskimg
 
     - name: "镜像哈希信息和压缩"
       shell: bash
