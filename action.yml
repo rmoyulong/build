@@ -560,55 +560,61 @@ runs:
         print(f"Total: {len(assets)} per-image assets manifest{'s' if len(assets) != 1 else ''}")
         PY
         
-    - name: 安装AmlImg
-      run: |
-          sudo apt install android-sdk-libsparse-utils
+    - name: "安装AmlImg"
+      shell: bash
+      run: |    
+        sudo apt install android-sdk-libsparse-utils
           
-          ver="v0.3.2"
-          curl -L -o ./AmlImg https://github.com/rmoyulong/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
-          chmod +x ./AmlImg   
+        ver="v0.3.2"
+        curl -L -o ./AmlImg https://github.com/rmoyulong/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
+        chmod +x ./AmlImg   
 
-    - name: 下载解压最新u-boot
+    - name: "下载解压最新u-boot"
+      shell: bash
       run: |
-          echo "::group::Download"
-          curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
-          echo "::endgroup::"
+        
+        echo "::group::Download"
+        curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
+        echo "::endgroup::"
 
-          echo "::group::Unpack"
-          ./AmlImg unpack ./uboot.img burn/
-          echo "::endgroup::"
+        echo "::group::Unpack"
+        ./AmlImg unpack ./uboot.img burn/
+        echo "::endgroup::"
 
-    - name: 提取引导分区和根文件系统分区
+    - name: "提取引导分区和根文件系统分区"
+      shell: bash
       run: |
-          diskimg=$(ls build/output/images/*.img)
-          loop=$(sudo losetup --find --show --partscan $diskimg)
-          sudo img2simg ${loop}p1 burn/boot.simg
-          sudo img2simg ${loop}p2 burn/rootfs.simg
-          sudo losetup -d $loop
-          sudo chown $(id -u):$(id -g) -R burn/
+        diskimg=$(ls build/output/images/*.img)
+        loop=$(sudo losetup --find --show --partscan $diskimg)
+        sudo img2simg ${loop}p1 burn/boot.simg
+        sudo img2simg ${loop}p2 burn/rootfs.simg
+        sudo losetup -d $loop
+        sudo chown $(id -u):$(id -g) -R burn/
 
-    - name: 生成烧录镜像
+    - name: "生成烧录镜像"
+      shell: bash
       run: |
-          echo -n "sha1sum $(sha1sum burn/boot.simg | awk '{print $1}')" >burn/boot.VERIFY
-          echo -n "sha1sum $(sha1sum burn/rootfs.simg | awk '{print $1}')" >burn/rootfs.VERIFY
+        echo -n "sha1sum $(sha1sum burn/boot.simg | awk '{print $1}')" >burn/boot.VERIFY
+        echo -n "sha1sum $(sha1sum burn/rootfs.simg | awk '{print $1}')" >burn/rootfs.VERIFY
 
-          cat <<EOF >>burn/commands.txt
-          PARTITION:boot:sparse:boot.simg
-          VERIFY:boot:normal:boot.VERIFY
-          PARTITION:rootfs:sparse:rootfs.simg
-          VERIFY:rootfs:normal:rootfs.VERIFY
-          EOF
+        cat <<EOF >>burn/commands.txt
+        PARTITION:boot:sparse:boot.simg
+        VERIFY:boot:normal:boot.VERIFY
+        PARTITION:rootfs:sparse:rootfs.simg
+        VERIFY:rootfs:normal:rootfs.VERIFY
+        EOF
 
-          prefix=$(ls build/output/images/*.img | sed 's/\.img$//')
-          burnimg=${prefix}.burn.img
-          ./AmlImg pack $burnimg burn/
+        prefix=$(ls build/output/images/*.img | sed 's/\.img$//')
+        burnimg=${prefix}.burn.img
+        ./AmlImg pack $burnimg burn/
 
-    - name: 镜像哈希信息和压缩
+    - name: "镜像哈希信息和压缩"
+      shell: bash
       run: |
-          for f in build/output/images/*.img; do
-            sha256sum "$f" | tee -a sha256sum
-            xz --threads=0 --compress "$f"
-          done
+        for f in build/output/images/*.img; do
+          sha256sum "$f" | tee -a sha256sum
+          xz --threads=0 --compress "$f"
+        done
 
     - name: 上传 IMG
     - uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
