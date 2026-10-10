@@ -603,24 +603,73 @@ runs:
     - name: "提取引导分区和根文件系统分区"
       shell: bash
       run: |
+        set -euo pipefail   # 比 -e 更严格：未定义变量报错、管道任一环失败报错
+
         cd build
-        
-        cp -rfp output/images/*.xz ./
-        diskxz=$(ls ./*.xz)
-        xz -d $diskxz
-        mv *.img output/images/
-        echo "build目录列表"
-        ls
-        echo "output/images/目录列表"
-        ls  output/images/
+        mkdir -p burn
+
+        # 明确只取一个 xz 文件，多于一个直接报错
+        diskxz=(output/images/*.img.xz)
+        if [[ ${#diskxz[@]} -ne 1 ]]; then
+          echo "错误：期望恰好 1 个 .img.xz 文件，实际找到 ${#diskxz[@]} 个：" >&2
+          printf '  %s\n' "${diskxz[@]}" >&2
+          exit 1
+        fi
+
+        echo "解压镜像：${diskxz[0]}"
+        xz -dkf "${diskxz[0]}"   # -k 保留原 xz，-f 覆盖已存在的 img
+
+        # 同样断言只有一个 img
+        diskimgs=(output/images/*.img)
+        if [[ ${#diskimgs[@]} -ne 1 ]]; then
+          echo "错误：期望恰好 1 个 .img 文件，实际找到 ${#diskimgs[@]} 个：" >&2
+          printf '  %s\n' "${diskimgs[@]}" >&2
+          exit 1
+        fi
+        diskimg="${diskimgs[0]}"
+
+        echo "build 目录列表："
+        ls -la
+        echo "output/images/ 目录列表："
+        ls -la output/images/
         sync
-        
-        diskimg=$(ls output/images/*.img)
-        loop=$(sudo losetup --find --show --partscan $diskimg)
-        sudo img2simg ${loop}p1 burn/boot.simg
-        sudo img2simg ${loop}p2 burn/rootfs.simg
-        sudo losetup -d $loop
-        sudo chown $(id -u):$(id -g) -R burn/
+
+        # ---- 挂载 loop 并确保清理 ----
+        loop=""
+        cleanup() {
+          local rc=$?
+          if [[ -n "$loop" ]]; then
+            sudo losetup -d "$loop" || true
+          fi
+          exit $rc
+        }
+        trap cleanup EXIT INT TERM
+
+        loop=$(sudo losetup --find --show --partscan "$diskimg")
+        echo "loop 设备：$loop"
+
+        # 等待分区节点出现（最多 5 秒）
+        for i in {1..50}; do
+          [[ -b "${loop}p1" && -b "${loop}p2" ]] && break
+          sleep 0.1
+        done
+        if [[ ! -b "${loop}p1" || ! -b "${loop}p2" ]]; then
+          echo "错误：分区设备 ${loop}p1 / ${loop}p2 未就绪" >&2
+          ls -l "${loop}"* || true
+          exit 1
+        fi
+
+        sudo img2simg "${loop}p1" burn/boot.simg
+        sudo img2simg "${loop}p2" burn/rootfs.simg
+
+        # trap 会自动卸载，这里也可以显式卸载让后续权限修复更安全
+        sudo losetup -d "$loop"
+        loop=""
+
+        sudo chown -R "$(id -u):$(id -g)" burn/
+
+        echo "burn/ 目录内容："
+        ls -lh burn/
 
     - name: "生成烧录镜像"
       shell: bash
