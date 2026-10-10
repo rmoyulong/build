@@ -617,7 +617,8 @@ runs:
         fi
 
         echo "解压镜像：${diskxz[0]}"
-        xz -dkf "${diskxz[0]}"   # -k 保留原 xz，-f 覆盖已存在的 img
+        sudo xz -dkf "${diskxz[0]}"   # -k 保留原 xz，-f 覆盖已存在的 img
+        sudo chown "$(id -u):$(id -g)" "${diskxz[0]%.xz}"
 
         # 同样断言只有一个 img
         diskimgs=(output/images/*.img)
