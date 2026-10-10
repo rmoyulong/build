@@ -603,6 +603,10 @@ runs:
       shell: bash
       run: |
         cd build
+        
+        diskxz=$(ls output/images/*.img.xz)
+        #在output/images目录解压缩.img.xz 并保留原始output/images目录下的 .img.xz 文件
+        xz -dk $diskxz -C ./output/images
         diskimg=$(ls output/images/*.img)
         loop=$(sudo losetup --find --show --partscan $diskimg)
         sudo img2simg ${loop}p1 burn/boot.simg
