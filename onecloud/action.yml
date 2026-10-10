@@ -590,7 +590,8 @@ runs:
     - name: "下载解压最新u-boot"
       shell: bash
       run: |
-        cd build      
+        cd build
+        ls output/images/*
         echo "::group::Download"
         curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
         echo "::endgroup::"
@@ -604,9 +605,12 @@ runs:
       run: |
         cd build
         
-        diskxz=$(ls output/images/*.img.xz)
-        #在output/images目录解压缩.img.xz 并保留原始output/images目录下的 .img.xz 文件
-        xz -dk $diskxz -C ./output/images
+        cp -rfp output/images/*.xz ./
+        diskxz=$(ls ./*.xz)
+        xz -d $diskxz
+        ls
+        mv *.img output/images/
+        
         diskimg=$(ls output/images/*.img)
         loop=$(sudo losetup --find --show --partscan $diskimg)
         sudo img2simg ${loop}p1 burn/boot.simg
