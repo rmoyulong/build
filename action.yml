@@ -591,6 +591,8 @@ runs:
       shell: bash
       run: |
         cd build
+        mkdir -p burn
+        
         ls output/images/*
         echo "::group::Download"
         curl -L -o ./uboot.img https://github.com/rmoyulong/u-boot-onecloud/releases/download/Onecloud_Uboot_23.12.24_18.15.09/eMMC.burn.img
@@ -606,8 +608,6 @@ runs:
         set -euo pipefail   # 比 -e 更严格：未定义变量报错、管道任一环失败报错
 
         cd build
-        mkdir -p burn
-
         # 明确只取一个 xz 文件，多于一个直接报错
         diskxz=(output/images/*.img.xz)
         if [[ ${#diskxz[@]} -ne 1 ]]; then
