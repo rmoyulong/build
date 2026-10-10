@@ -141,7 +141,7 @@ runs:
     - name: "检出 Armbian 构建框架"
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
-        repository: rmoyulong/build
+        repository: armbian/build
         ref: ${{ inputs.armbian_branch }}
         clean: false
         path: build
@@ -152,6 +152,16 @@ runs:
         fetch-depth: 0
         clean: false
         path: custom
+        
+    - name: "给玩客云armbian打补丁"
+      env:
+        ARMBIAN_TAG: 6.12.112   
+      run: |
+        sed -i 's/declare -g KERNELBRANCH="tag:v6.12.28" # frozen on this version/declare -g KERNELBRANCH="tag:v${ARMBIAN_TAG}"/' \
+          config/sources/families/include/meson_common.inc
+        curl -fsSL -o patch/kernel/archive/meson-6.12/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch \
+          "https://raw.githubusercontent.com/rmoyulong/OneCloud_armbian/refs/heads/master/patch/0052-drm-meson-Describe-the-HDMI-PHY-frequency-limits-of-.patch"
+        grep -n 'KERNEL_MAJOR_MINOR\|KERNELBRANCH' config/sources/families/include/meson_common.inc || true         
 
     - shell: bash
       env:
