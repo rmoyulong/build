@@ -6,7 +6,7 @@ inputs:
   ONECLOUD_VERSION: 
     description: "玩客云 armbian Linux 版本"
     required: true
-    default: "6.12.112"
+    default: "6.12.113"
     
   armbian_token:
     description: "GitHub installation access token"
@@ -290,7 +290,7 @@ runs:
             gpg --passphrase-fd 0 --armor --detach-sign --pinentry-mode loopback --batch --yes "${image}"
         done
 
-    - name: "Generate release assets manifest"
+    - name: "生成发布资源清单"
       shell: bash
       env:
         ARMBIAN_VERSION: ${{ env.ARMBIAN_VERSION }}
