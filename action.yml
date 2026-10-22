@@ -6,7 +6,7 @@ inputs:
   ONECLOUD_VERSION: 
     description: "玩客云 armbian Linux 版本"
     required: true
-    default: "6.12.113"
+    default: "6.12.114"
     
   armbian_token:
     description: "GitHub installation access token"
